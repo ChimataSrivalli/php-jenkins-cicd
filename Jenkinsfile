@@ -10,7 +10,7 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 echo "Cloning GitHub Repo..."
-                git branch: 'main', url: 'git@github.com:username/php-jenkins-cicd.git'
+                git branch: 'main', url: 'git@github.com:ChimataSrivalli/php-jenkins-cicd.git'
             }
         }
 
