@@ -1,23 +1,21 @@
 pipeline {
     agent any
 
-    environment {
-        DEPLOY_DIR = "/var/www/html/phpapp"
-    }
-
     stages {
 
         stage('Checkout Code') {
             steps {
-                echo "Cloning GitHub Repo..."
-                git branch: 'main', url: 'git@github.com:ChimataSrivalli/php-jenkins-cicd.git'
+                git credentialsId: 'github-ssh-key',
+                    url: 'git@github.com:ChimataSrivalli/php-jenkins-cicd.git',
+                    branch: 'main'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                echo "Installing composer dependencies..."
                 sh '''
+                    pwd
+                    ls -la
                     composer install --no-interaction
                 '''
             }
@@ -25,30 +23,20 @@ pipeline {
 
         stage('Run Unit Tests') {
             steps {
-                echo "Running PHPUnit tests..."
                 sh '''
-                    ./vendor/bin/phpunit --testdox
+                    pwd
+                    ls -la
+                    ./vendor/bin/phpunit --testdox tests
                 '''
             }
         }
 
-        stage('Deploy to Apache') {
+        stage('Deploy') {
             steps {
-                echo "Deploying application to Apache folder..."
                 sh '''
-                    sudo rm -rf ${DEPLOY_DIR}/*
-                    sudo cp -r * ${DEPLOY_DIR}/
+                    sudo cp -r * /var/www/html/phpapp/
                 '''
             }
-        }
-    }
-
-    post {
-        success {
-            echo "Deployment Successful!"
-        }
-        failure {
-            echo "Pipeline Failed!"
         }
     }
 }
